@@ -11,6 +11,3 @@ def create_output_dir(prefix='', suffix=''):
 	:return:
 	"""
 	return Path(prefix + datetime.now().strftime('%Y%m%d%H%M') + suffix).mkdir(parents=True, exist_ok=True)
-
-if __name__ == '__main__':
-    create_output_dir('salar_')
