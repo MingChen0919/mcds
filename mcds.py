@@ -10,4 +10,8 @@ def create_output_dir(prefix='', suffix=''):
 	:param suffix:
 	:return:
 	"""
-	return Path(prefix + datetime.now().strftime('%Y%m%d%H%M') + suffix).mkdir(parents=True, exist_ok=True)
+
+	dir_path = Path(prefix + datetime.now().strftime('%Y%m%d%H%M') + suffix)
+	dir_path.mkdir(parents=True, exist_ok=True)
+
+	return str(dir_path)
