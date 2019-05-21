@@ -173,6 +173,7 @@ def fill_numeric_features_na_by_group_mean(df, numeric_f, group_by=()):
 		df.loc[:, numeric_f] = df.loc[:, numeric_f].transform(lambda x: x.fillna(x.mean()))
 	return df
 
+
 def fill_categorical_features_na_by_group_mode(df, categorical_f, group_by=()):
 	"""
 	Fill NAs in categorical features from df with group mode.
@@ -202,3 +203,59 @@ def fill_categorical_features_na_by_group_mode(df, categorical_f, group_by=()):
 	else:
 		df.loc[:, categorical_f] = df.loc[:, categorical_f].transform(fill_na_with_mode)
 	return df
+
+
+class DatasetsVersionController:
+	"""
+	During the data analysis process, I find that sometimes I need to apply different data manipulation processes to the
+	same dataset. I end up with several different versions of preprocessed datasets and many times it is hard to determine
+	which version should be used in the modeling process. This class aims to create an instance to handle different
+	dataset versions in the analysis. Each dataset should have a log to record what kind of processing has been done to it.
+	"""
+
+	def __init__(self, datasets={}):
+		self.datasets = datasets
+
+	def add_dataset(self, dataset, dataset_name):
+		"""
+		Add a new dataset to the datasets dictionary.
+
+		:param DataFrame dataset:
+		:param str dataset_name:
+		:return:
+		"""
+
+		if dataset_name in list(self.datasets.keys()):
+			raise Exception(
+				'{} already exists. Please choose a different name or update the corresponding dataset.'.format(
+					dataset_name))
+		else:
+			self.datasets[dataset_name] = {
+				'data': dataset,
+				'log': pd.DataFrame(columns=['time', 'message'])
+			}
+
+	def log(self, dataset_name, log_message):
+		"""
+		Add dataset processing log to a dataset.
+
+		:param dataset_name:
+		:param log_message:
+		:return:
+		"""
+		if dataset_name not in list(self.datasets.keys()):
+			raise Exception(
+				'{} does not exit. Available datasets are: {}.'.format(dataset_name,list(self.datasets.keys())))
+
+		self.datasets[dataset_name]['log'] = self.datasets[dataset_name]['log'].append({
+			'time': datetime.now(),
+			'message': log_message
+		})
+
+	def list_all_datasets(self):
+		"""
+		List all registered datasets.
+
+		:return:
+		"""
+		return list(self.datasets.keys())
