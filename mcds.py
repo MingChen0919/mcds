@@ -245,12 +245,38 @@ class DatasetsVersionController:
 		"""
 		if dataset_name not in list(self.datasets.keys()):
 			raise Exception(
-				'{} does not exit. Available datasets are: {}.'.format(dataset_name,list(self.datasets.keys())))
+				'{} does not exit. Available datasets are: {}.'.format(dataset_name, list(self.datasets.keys())))
 
 		self.datasets[dataset_name]['log'] = self.datasets[dataset_name]['log'].append({
 			'time': datetime.now(),
 			'message': log_message
-		})
+		}, ignore_index=True)
+
+	def get_dataset(self, dataset_name):
+		"""
+		Get dataset by name.
+
+		:param dataset_name:
+		:return:
+		"""
+		if dataset_name not in list(self.datasets.keys()):
+			raise Exception(
+				'"{}" does not exit. Available datasets are: {}.'.format(dataset_name, list(self.datasets.keys())))
+
+		return self.datasets[dataset_name]['data']
+
+	def get_dataset_log(self, dataset_name):
+		"""
+		Get dataset log messages by name.
+
+		:param dataset_name:
+		:return:
+		"""
+		if dataset_name not in list(self.datasets.keys()):
+			raise Exception(
+				'"{}" does not exit. Available datasets are: {}.'.format(dataset_name, list(self.datasets.keys())))
+
+		return self.datasets[dataset_name]['log']
 
 	def list_all_datasets(self):
 		"""
