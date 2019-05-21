@@ -22,12 +22,22 @@ class FeatureBag:
 	Create an instance that stores features by type.
 	"""
 
-	def __init__(self, numeric_f=[], ordinal_f=[], binary_class_f=[], multi_class_f=[], datetime_f=[]):
+	def __init__(self, numeric_f=[], ordinal_f=[], binary_class_f=[], multi_class_f=[], datetime_f=[], id_f=[]):
+		"""
+
+		:param list numeric_f: a list of numeric features
+		:param list ordinal_f: a list of ordinal features
+		:param list binary_class_f: a list of binary features
+		:param list multi_class_f: a list of multi-class features
+		:param list datetime_f: a list of datetime features
+		:param list id_f: a list of features that are used for grouping, data frame merging, etc.
+		"""
 		self.numeric_f = list(set(numeric_f))
 		self.ordinal_f = list(set(ordinal_f))
 		self.binary_class_f = list(set(binary_class_f))
 		self.multi_class_f = list(set(multi_class_f))
 		self.datetime_f = list(set(datetime_f))
+		self.id_f = list(set(id_f))
 
 	def add_to_numeric_f(self, add_features=[]):
 		"""
@@ -118,3 +128,21 @@ class FeatureBag:
 		"""
 
 		self.datetime_f = list(set(self.datetime_f) - set(remove_features))
+
+	def add_to_id_f(self, add_features=[]):
+		"""
+
+		:param list add_features: a list of features to be added to the id_f bag.
+		:return:
+		"""
+
+		self.id_f = list(set(self.id_f + add_features))
+
+	def remove_from_id_f(self, remove_features=[]):
+		"""
+
+		:param list remove_features: a list of features to be removed from the id_f bag.
+		:return:
+		"""
+
+		self.id_f = list(set(self.id_f) - set(remove_features))
