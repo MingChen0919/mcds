@@ -1,3 +1,5 @@
+import pandas as pd
+import numpy as np
 from pathlib import Path
 from datetime import datetime
 
@@ -22,7 +24,8 @@ class FeatureBag:
 	Create an instance that stores features by type.
 	"""
 
-	def __init__(self, numeric_f=[], ordinal_f=[], binary_class_f=[], multi_class_f=[], datetime_f=[], id_f=[]):
+	def __init__(self, numeric_f=(), ordinal_f=(), binary_class_f=(), multi_class_f=(), datetime_f=(), id_f=(),
+				 unused_f=()):
 		"""
 
 		:param list numeric_f: a list of numeric features
@@ -31,6 +34,7 @@ class FeatureBag:
 		:param list multi_class_f: a list of multi-class features
 		:param list datetime_f: a list of datetime features
 		:param list id_f: a list of features that are used for grouping, data frame merging, etc.
+		:param list unused_f: a list of features that
 		"""
 		self.numeric_f = list(set(numeric_f))
 		self.ordinal_f = list(set(ordinal_f))
@@ -38,8 +42,9 @@ class FeatureBag:
 		self.multi_class_f = list(set(multi_class_f))
 		self.datetime_f = list(set(datetime_f))
 		self.id_f = list(set(id_f))
+		self.unused_f = list(set(unused_f))
 
-	def add_to_numeric_f(self, add_features=[]):
+	def add_to_numeric_f(self, add_features=()):
 		"""
 
 		:param list add_features: a list of features to be added to the numeric_f bag.
@@ -48,7 +53,7 @@ class FeatureBag:
 
 		self.numeric_f = list(set(self.numeric_f + add_features))
 
-	def remove_from_numeric_f(self, remove_features=[]):
+	def remove_from_numeric_f(self, remove_features=()):
 		"""
 
 		:param list remove_features: a list of features to be removed from the numeric_f bag.
@@ -57,7 +62,7 @@ class FeatureBag:
 
 		self.numeric_f = list(set(self.numeric_f) - set(remove_features))
 
-	def add_to_ordinal_f(self, add_features=[]):
+	def add_to_ordinal_f(self, add_features=()):
 		"""
 
 		:param list add_features: a list of features to be added to the ordinal_f bag.
@@ -66,7 +71,7 @@ class FeatureBag:
 
 		self.ordinal_f = list(set(self.ordinal_f + add_features))
 
-	def remove_from_ordinal_f(self, remove_features=[]):
+	def remove_from_ordinal_f(self, remove_features=()):
 		"""
 
 		:param list remove_features: a list of features to be removed from the ordinal_f bag.
@@ -75,7 +80,7 @@ class FeatureBag:
 
 		self.ordinal_f = list(set(self.ordinal_f) - set(remove_features))
 
-	def add_to_binary_class_f(self, add_features=[]):
+	def add_to_binary_class_f(self, add_features=()):
 		"""
 
 		:param list add_features: a list of features to be added to the binary_class_f bag.
@@ -84,7 +89,7 @@ class FeatureBag:
 
 		self.binary_class_f = list(set(self.binary_class_f + add_features))
 
-	def remove_from_binary_class_f(self, remove_features=[]):
+	def remove_from_binary_class_f(self, remove_features=()):
 		"""
 
 		:param list remove_features: a list of features to be removed from the binary_class_f bag.
@@ -93,7 +98,7 @@ class FeatureBag:
 
 		self.binary_class_f = list(set(self.binary_class_f) - set(remove_features))
 
-	def add_to_multi_class_f(self, add_features=[]):
+	def add_to_multi_class_f(self, add_features=()):
 		"""
 
 		:param list add_features: a list of features to be added to the multi_class_f bag.
@@ -102,7 +107,7 @@ class FeatureBag:
 
 		self.multi_class_f = list(set(self.multi_class_f + add_features))
 
-	def remove_from_multi_class_f(self, remove_features=[]):
+	def remove_from_multi_class_f(self, remove_features=()):
 		"""
 
 		:param list remove_features: a list of features to be removed from the multi_class_f bag.
@@ -111,7 +116,7 @@ class FeatureBag:
 
 		self.multi_class_f = list(set(self.multi_class_f) - set(remove_features))
 
-	def add_to_datetime_f(self, add_features=[]):
+	def add_to_datetime_f(self, add_features=()):
 		"""
 
 		:param list add_features: a list of features to be added to the datetime_f bag.
@@ -120,7 +125,7 @@ class FeatureBag:
 
 		self.datetime_f = list(set(self.datetime_f + add_features))
 
-	def remove_from_datetime_f(self, remove_features=[]):
+	def remove_from_datetime_f(self, remove_features=()):
 		"""
 
 		:param list remove_features: a list of features to be removed from the datetime_f bag.
@@ -129,7 +134,7 @@ class FeatureBag:
 
 		self.datetime_f = list(set(self.datetime_f) - set(remove_features))
 
-	def add_to_id_f(self, add_features=[]):
+	def add_to_id_f(self, add_features=()):
 		"""
 
 		:param list add_features: a list of features to be added to the id_f bag.
@@ -138,7 +143,7 @@ class FeatureBag:
 
 		self.id_f = list(set(self.id_f + add_features))
 
-	def remove_from_id_f(self, remove_features=[]):
+	def remove_from_id_f(self, remove_features=()):
 		"""
 
 		:param list remove_features: a list of features to be removed from the id_f bag.
@@ -146,3 +151,54 @@ class FeatureBag:
 		"""
 
 		self.id_f = list(set(self.id_f) - set(remove_features))
+
+
+def fill_numeric_features_na_by_group_mean(df, numeric_f, group_by=()):
+	"""
+	Fill NAs in numeric columns from df with group average.
+
+	:param DataFrame df: the data frame in which numeric features are manipulated to fill in NAs.
+	:param list numeric_f: a list of numeric features exist in df.
+	:param list group_by: a list of features used to group the data frame.
+	:return: the same df but with NAs in the numeric features being processed.
+	"""
+	df = df.copy(deep=True)
+
+	if len(group_by) > 0:
+		none_df_features = [i for i in group_by if i not in df.columns]
+		if len(none_df_features) > 0:
+			raise Exception('These features are not in the data: {}'.format(none_df_features))
+		df.loc[:, numeric_f] = df.loc[:, group_by + numeric_f].grouby(group_by).transform(lambda x: x.fillna(x.mean()))
+	else:
+		df.loc[:, numeric_f] = df.loc[:, numeric_f].transform(lambda x: x.fillna(x.mean()))
+	return df
+
+def fill_categorical_features_na_by_group_mode(df, categorical_f, group_by=()):
+	"""
+	Fill NAs in categorical features from df with group mode.
+
+	:param DataFrame df: the data frame in which categorical features are manipulated to fill in NAs.
+	:param list categorical_f: a list of categorical features exist in df.
+	:param list group_by: a list of features used to group the data frame.
+	:return: the same df but with NAs in the categorical features being processed.
+	"""
+	df = df.copy(deep=True)
+
+	def fill_na_with_mode(series):
+		"""
+		Fill NAs in a pandas Series with most frequent element value.
+
+		:param pandas.Series series: a pandas series
+		:return: a pandas series with NAs being replaced with the most frequent element values.
+		"""
+		mode = series.value_counts().index[0]
+		return series.fillna(mode)
+
+	if (len(group_by)) > 0:
+		none_df_features = [i for i in group_by if i not in df.columns]
+		if len(none_df_features) > 0:
+			raise Exception('These features are not in the data: {}'.format(none_df_features))
+		df.loc[:, categorical_f] = df.loc[:, group_by + categorical_f].groupby(group_by).transform(fill_na_with_mode)
+	else:
+		df.loc[:, categorical_f] = df.loc[:, categorical_f].transform(fill_na_with_mode)
+	return df
