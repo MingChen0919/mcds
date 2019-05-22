@@ -235,6 +235,20 @@ class DatasetsVersionController:
 				'log': pd.DataFrame(columns=['time', 'message'])
 			}
 
+	def update_dataset(self, dataset, dataset_name):
+		"""
+		Update the dataset associated with dataset_name.
+
+		:param DataFrame dataset: a new dataset used to replace the old one.
+		:param str dataset_name: an existing dataset_name.
+		:return:
+		"""
+		if dataset_name not in list(self.datasets.keys()):
+			raise Exception(
+				'{} does exists.'.format(dataset_name))
+		else:
+			self.datasets[dataset_name]['data'] = dataset
+
 	def log(self, dataset_name, log_message):
 		"""
 		Add dataset processing log to a dataset.
