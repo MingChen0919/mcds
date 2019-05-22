@@ -19,30 +19,37 @@ def create_output_dir(prefix='', suffix=''):
 	return str(dir_path)
 
 
-class FeatureBag:
+class FeatureBags:
 	"""
 	Create an instance that stores features by type.
 	"""
 
-	def __init__(self, numeric_f=(), ordinal_f=(), binary_class_f=(), multi_class_f=(), datetime_f=(), id_f=(),
-				 unused_f=()):
+	def __init__(self):
+		"""
+		Initial bags for each type of features
+		"""
+		self.numeric_f = []
+		self.ordinal_f = []
+		self.binary_class_f = []
+		self.multi_class_f = []
+		self.datetime_f = []
+		self.id_f = []
+		self.unused_f = []
+
+	def get_all_f(self):
+		"""
+		Return a list of features from all feature bags.
+
+		:return:
 		"""
 
-		:param list numeric_f: a list of numeric features
-		:param list ordinal_f: a list of ordinal features
-		:param list binary_class_f: a list of binary features
-		:param list multi_class_f: a list of multi-class features
-		:param list datetime_f: a list of datetime features
-		:param list id_f: a list of features that are used for grouping, data frame merging, etc.
-		:param list unused_f: a list of features that
-		"""
-		self.numeric_f = list(set(numeric_f))
-		self.ordinal_f = list(set(ordinal_f))
-		self.binary_class_f = list(set(binary_class_f))
-		self.multi_class_f = list(set(multi_class_f))
-		self.datetime_f = list(set(datetime_f))
-		self.id_f = list(set(id_f))
-		self.unused_f = list(set(unused_f))
+		return sorted(list(set(self.numeric_f +
+							   self.ordinal_f +
+							   self.binary_class_f +
+							   self.multi_class_f +
+							   self.datetime_f +
+							   self.id_f +
+							   self.unused_f)))
 
 	def add_to_numeric_f(self, add_features=()):
 		"""
@@ -51,7 +58,15 @@ class FeatureBag:
 		:return:
 		"""
 
-		self.numeric_f = list(set(self.numeric_f + add_features))
+		self.numeric_f = sorted(list(set(self.numeric_f + add_features)))
+
+		# remove the added features from other bags
+		self.remove_from_binary_class_f(add_features)
+		self.remove_from_datetime_f(add_features)
+		self.remove_from_id_f(add_features)
+		self.remove_from_multi_class_f(add_features)
+		self.remove_from_ordinal_f(add_features)
+		self.remove_from_unused_f(add_features)
 
 	def remove_from_numeric_f(self, remove_features=()):
 		"""
@@ -69,7 +84,15 @@ class FeatureBag:
 		:return:
 		"""
 
-		self.ordinal_f = list(set(self.ordinal_f + add_features))
+		self.ordinal_f = sorted(list(set(self.ordinal_f + add_features)))
+
+		# remove the added features from other bags
+		self.remove_from_numeric_f(add_features)
+		self.remove_from_binary_class_f(add_features)
+		self.remove_from_datetime_f(add_features)
+		self.remove_from_id_f(add_features)
+		self.remove_from_multi_class_f(add_features)
+		self.remove_from_unused_f(add_features)
 
 	def remove_from_ordinal_f(self, remove_features=()):
 		"""
@@ -87,7 +110,15 @@ class FeatureBag:
 		:return:
 		"""
 
-		self.binary_class_f = list(set(self.binary_class_f + add_features))
+		self.binary_class_f = sorted(list(set(self.binary_class_f + add_features)))
+
+		# remove the added features from other bags
+		self.remove_from_numeric_f(add_features)
+		self.remove_from_datetime_f(add_features)
+		self.remove_from_id_f(add_features)
+		self.remove_from_multi_class_f(add_features)
+		self.remove_from_ordinal_f(add_features)
+		self.remove_from_unused_f(add_features)
 
 	def remove_from_binary_class_f(self, remove_features=()):
 		"""
@@ -96,7 +127,7 @@ class FeatureBag:
 		:return:
 		"""
 
-		self.binary_class_f = list(set(self.binary_class_f) - set(remove_features))
+		self.binary_class_f = sorted(list(set(self.binary_class_f) - set(remove_features)))
 
 	def add_to_multi_class_f(self, add_features=()):
 		"""
@@ -105,7 +136,15 @@ class FeatureBag:
 		:return:
 		"""
 
-		self.multi_class_f = list(set(self.multi_class_f + add_features))
+		self.multi_class_f = sorted(list(set(self.multi_class_f + add_features)))
+
+		# remove the added features from other bags
+		self.remove_from_numeric_f(add_features)
+		self.remove_from_binary_class_f(add_features)
+		self.remove_from_datetime_f(add_features)
+		self.remove_from_id_f(add_features)
+		self.remove_from_ordinal_f(add_features)
+		self.remove_from_unused_f(add_features)
 
 	def remove_from_multi_class_f(self, remove_features=()):
 		"""
@@ -114,7 +153,7 @@ class FeatureBag:
 		:return:
 		"""
 
-		self.multi_class_f = list(set(self.multi_class_f) - set(remove_features))
+		self.multi_class_f = sorted(list(set(self.multi_class_f) - set(remove_features)))
 
 	def add_to_datetime_f(self, add_features=()):
 		"""
@@ -125,6 +164,14 @@ class FeatureBag:
 
 		self.datetime_f = list(set(self.datetime_f + add_features))
 
+		# remove the added features from other bags
+		self.remove_from_numeric_f(add_features)
+		self.remove_from_binary_class_f(add_features)
+		self.remove_from_id_f(add_features)
+		self.remove_from_multi_class_f(add_features)
+		self.remove_from_ordinal_f(add_features)
+		self.remove_from_unused_f(add_features)
+
 	def remove_from_datetime_f(self, remove_features=()):
 		"""
 
@@ -132,7 +179,7 @@ class FeatureBag:
 		:return:
 		"""
 
-		self.datetime_f = list(set(self.datetime_f) - set(remove_features))
+		self.datetime_f = sorted(list(set(self.datetime_f) - set(remove_features)))
 
 	def add_to_id_f(self, add_features=()):
 		"""
@@ -141,7 +188,15 @@ class FeatureBag:
 		:return:
 		"""
 
-		self.id_f = list(set(self.id_f + add_features))
+		self.id_f = sorted(list(set(self.id_f + add_features)))
+
+		# remove the added features from other bags
+		self.remove_from_numeric_f(add_features)
+		self.remove_from_binary_class_f(add_features)
+		self.remove_from_datetime_f(add_features)
+		self.remove_from_multi_class_f(add_features)
+		self.remove_from_ordinal_f(add_features)
+		self.remove_from_unused_f(add_features)
 
 	def remove_from_id_f(self, remove_features=()):
 		"""
@@ -150,7 +205,33 @@ class FeatureBag:
 		:return:
 		"""
 
-		self.id_f = list(set(self.id_f) - set(remove_features))
+		self.id_f = sorted(list(set(self.id_f) - set(remove_features)))
+
+	def add_to_unused_f(self, add_features=()):
+		"""
+
+		:param list add_features: a list of features to be added to the unused_f bag.
+		:return:
+		"""
+
+		self.unused_f = sorted(list(set(self.unused_f + add_features)))
+
+		# remove the added features from other bags
+		self.remove_from_numeric_f(add_features)
+		self.remove_from_binary_class_f(add_features)
+		self.remove_from_datetime_f(add_features)
+		self.remove_from_multi_class_f(add_features)
+		self.remove_from_ordinal_f(add_features)
+		self.remove_from_id_f(add_features)
+
+	def remove_from_unused_f(self, remove_features=()):
+		"""
+
+		:param list remove_features: a list of features to be removed from the unused_f bag.
+		:return:
+		"""
+
+		self.unused_f = sorted(list(set(self.unused_f) - set(remove_features)))
 
 
 def fill_numeric_features_na_by_group_mean(df, numeric_f, group_by=()):
