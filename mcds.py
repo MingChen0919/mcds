@@ -213,8 +213,8 @@ class DatasetsVersionController:
 	dataset versions in the analysis. Each dataset should have a log to record what kind of processing has been done to it.
 	"""
 
-	def __init__(self):
-		self.datasets = {}
+	def __init__(self, datasets=None):
+		self.datasets = datasets
 
 	def add_dataset(self, dataset, dataset_name):
 		"""
@@ -224,6 +224,8 @@ class DatasetsVersionController:
 		:param str dataset_name:
 		:return:
 		"""
+		if self.datasets == None:
+			self.datasets = {}
 
 		if dataset_name in list(self.datasets.keys()):
 			raise Exception(
