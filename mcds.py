@@ -403,3 +403,20 @@ class DatasetsVersionController:
 		:return:
 		"""
 		return list(self.datasets.keys())
+
+def naify_extreme_values(x: pd.Series, n_iqr: int=3):
+	"""
+	Replace extreme values in a pd.Series with NAs.
+
+	:param pd.Series x: a pandas Series which potentially has extreme values
+	:param int n_iqr: the number of IQR used to define extreme values. Default is 3.
+	:return:
+	"""
+	Q1 = np.nanquantile(x, 0.25)
+	Q3 = np.nanquantile(x, 0.75)
+	IQR = Q3 - Q1
+	lower_b = Q1 - n_iqr * IQR
+	upper_b = Q3 + n_iqr * IQR
+	if Q3 > Q1:
+		x[(x < lower_b) | (x > upper_b)] = np.nan
+	return x
