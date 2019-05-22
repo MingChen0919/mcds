@@ -233,6 +233,29 @@ class FeatureBags:
 
 		self.unused_f = sorted(list(set(self.unused_f) - set(remove_features)))
 
+def as_type(feature_bags: FeatureBags, df: pd.DataFrame):
+	"""
+	Cast features into correct types.
+
+	:param FeatureBags feature_bags: a FeatureBags instance.
+	:param pd.DataFrame df: a data frame in which features are being casted.
+	:return:
+	"""
+	df = df.copy(deep=True)
+	types = {
+		'float': feature_bags.numeric_f,
+		'bool': feature_bags.binary_class_f,
+		'str': feature_bags.multi_class_f,
+		'datetime64[ns]': feature_bags.datetime_f
+	}
+
+	for i in types.keys():
+		if len(types[i]) > 0:
+			if i == 'bool':
+				df.loc[:, types[i]] = df.loc[:, types[i]].astype(i).astype('float')
+			else:
+				df.loc[:, types[i]] = df.loc[:, types[i]].astype(i)
+	return df
 
 def fill_numeric_features_na_by_group_mean(df, numeric_f, group_by=()):
 	"""
