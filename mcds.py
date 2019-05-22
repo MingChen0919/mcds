@@ -245,7 +245,7 @@ def as_type(feature_bags: FeatureBags, df: pd.DataFrame):
 	types = {
 		'float': feature_bags.numeric_f,
 		'bool': feature_bags.binary_class_f,
-		'str': feature_bags.multi_class_f,
+		'str': feature_bags.multi_class_f + feature_bags.id_f,
 		'datetime64[ns]': feature_bags.datetime_f
 	}
 
