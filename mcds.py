@@ -420,3 +420,18 @@ def naify_extreme_values(x: pd.Series, n_iqr: int=3):
 	if Q3 > Q1:
 		x[(x < lower_b) | (x > upper_b)] = np.nan
 	return x
+
+def get_missing_rate(df: pd.DataFrame, features: list=None):
+	"""
+	Calculate missing rate on selected features from a data frame. If features=None, it returns missing rates for all features.
+	:param df:
+	:param features:
+	:return:
+	"""
+
+	df = df.copy(deep=True)
+	df = df.loc[:, features].apply(lambda x: x.isna().sum() / len(x)).sort_values(
+		ascending=False).reset_index().rename()
+	df.columns = ['feature', 'missing_rate']
+	return df
+
