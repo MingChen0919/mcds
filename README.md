@@ -1,2 +1,3 @@
-# mcds
-Ming Chen's Data Science Python functions
+# MCDS
+
+Personal Functions for Data Science in Python
