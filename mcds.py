@@ -233,6 +233,65 @@ class FeatureBags:
 
 		self.unused_f = sorted(list(set(self.unused_f) - set(remove_features)))
 
+	def get_feature_bags(self):
+		"""
+		Return all feature bags.
+
+		:return:
+		"""
+		return {
+			'numeric_f': self.numeric_f,
+			'binary_class_f': self.binary_class_f,
+			'multi_class_f': self.multi_class_f,
+			'datetime_f': self.datetime_f,
+			'ordinal_f': self.ordinal_f,
+			'id_f': self.id_f,
+			'unused_f': self.unused_f
+		}
+
+	def export_feature_types_to_csv(self, file: str = 'feature_types.csv'):
+		"""
+		Create a pd.DataFrame to store features and the corresponding types, and then save the pd.DataFrame to a csv file.
+
+		:param str file:
+		:return:
+		"""
+
+		features = []
+		types = []
+		feature_bags = self.get_feature_bags()
+		for k, v in feature_bags.items():
+			if len(v) == 0: continue
+			features += v
+			types += [k] * len(v)
+
+		return pd.DataFrame({
+			'feature': features,
+			'type': types
+		}).to_csv(file, index=False)
+
+	def import_feature_types_from_csv(self, file='feature_types.csv'):
+		"""
+		Import feature types from a file.
+		:param file:
+		:return:
+		"""
+		feature_bags = pd.read_csv(file)
+		for type in feature_bags.type.unique():
+			if type == 'numeric_f':
+				self.numeric_f = feature_bags.loc[feature_bags['type'] == 'numeric_f', 'feature'].to_list()
+			if type == 'binary_class_f':
+				self.binary_class_f = feature_bags.loc[feature_bags['type'] == 'binary_class_f', 'feature'].to_list()
+			if type == 'multi_class_f':
+				self.multi_class_f = feature_bags.loc[feature_bags['type'] == 'multi_class_f', 'feature'].to_list()
+			if type == 'ordinal_f':
+				self.ordinal_f = feature_bags.loc[feature_bags['type'] == 'ordinal_f', 'feature'].to_list()
+			if type == 'id_f':
+				self.id_f = feature_bags.loc[feature_bags['type'] == 'id_f', 'feature'].to_list()
+			if type == 'unused_f':
+				self.unused_f = feature_bags.loc[feature_bags['type'] == 'unused_f', 'feature'].to_list()
+
+
 def as_type(feature_bags: FeatureBags, df: pd.DataFrame):
 	"""
 	Cast features into correct types.
@@ -256,6 +315,7 @@ def as_type(feature_bags: FeatureBags, df: pd.DataFrame):
 			else:
 				df.loc[:, types[i]] = df.loc[:, types[i]].astype(i)
 	return df
+
 
 def fill_numeric_features_na_by_group_mean(df, numeric_f, group_by=()):
 	"""
@@ -404,7 +464,8 @@ class DatasetsVersionController:
 		"""
 		return list(self.datasets.keys())
 
-def naify_extreme_values(x: pd.Series, n_iqr: int=3):
+
+def naify_extreme_values(x: pd.Series, n_iqr: int = 3):
 	"""
 	Replace extreme values in a pd.Series with NAs.
 
@@ -421,7 +482,8 @@ def naify_extreme_values(x: pd.Series, n_iqr: int=3):
 		x[(x < lower_b) | (x > upper_b)] = np.nan
 	return x
 
-def get_missing_rate(df: pd.DataFrame, features: list=None):
+
+def get_missing_rate(df: pd.DataFrame, features: list = None):
 	"""
 	Calculate missing rate on selected features from a data frame. If features=None, it returns missing rates for all features.
 	:param df:
@@ -434,4 +496,3 @@ def get_missing_rate(df: pd.DataFrame, features: list=None):
 		ascending=False).reset_index().rename()
 	df.columns = ['feature', 'missing_rate']
 	return df
-
