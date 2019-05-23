@@ -380,55 +380,32 @@ class DatasetsVersionController:
 	def __init__(self):
 		self.datasets = {}
 
-	def add_dataset(self, dataset, dataset_name):
+	def update_dataset(self, dataset, dataset_name, log_message):
 		"""
-		Add a new dataset to the datasets dictionary.
+		Add (if not exist) or update a dataset with a log message associated with the updating operation on the dataset.
 
-		:param DataFrame dataset:
-		:param str dataset_name:
+		:param DataFrame dataset: a new dataset used to replace the old one.
+		:param str dataset_name: an existing dataset_name.
+		:param str log_message: a message to show the operation on the dataset.
 		:return:
 		"""
-
-		if dataset_name in list(self.datasets.keys()):
-			raise Exception(
-				'{} already exists. Please choose a different name or update the corresponding dataset.'.format(
-					dataset_name))
-		else:
+		if dataset_name not in list(self.datasets.keys()):
+			print('"{}" does not exists. Adding "{}" as a new dataset'.format(dataset_name, dataset_name))
+			log_message = 'Inital dataset'
 			self.datasets[dataset_name] = {
 				'data': dataset,
 				'log': pd.DataFrame(columns=['time', 'message'])
 			}
-
-	def update_dataset(self, dataset, dataset_name):
-		"""
-		Update the dataset associated with dataset_name.
-
-		:param DataFrame dataset: a new dataset used to replace the old one.
-		:param str dataset_name: an existing dataset_name.
-		:return:
-		"""
-		if dataset_name not in list(self.datasets.keys()):
-			raise Exception(
-				'{} does exists.'.format(dataset_name))
+			self.datasets[dataset_name]['log'] = self.datasets[dataset_name]['log'].append({
+				'time': datetime.now(),
+				'message': log_message
+			}, ignore_index=True)
 		else:
 			self.datasets[dataset_name]['data'] = dataset
-
-	def log(self, dataset_name, log_message):
-		"""
-		Add dataset processing log to a dataset.
-
-		:param dataset_name:
-		:param log_message:
-		:return:
-		"""
-		if dataset_name not in list(self.datasets.keys()):
-			raise Exception(
-				'{} does not exit. Available datasets are: {}.'.format(dataset_name, list(self.datasets.keys())))
-
-		self.datasets[dataset_name]['log'] = self.datasets[dataset_name]['log'].append({
-			'time': datetime.now(),
-			'message': log_message
-		}, ignore_index=True)
+			self.datasets[dataset_name]['log'] = self.datasets[dataset_name]['log'].append({
+				'time': datetime.now(),
+				'message': log_message
+			}, ignore_index=True)
 
 	def get_dataset(self, dataset_name):
 		"""
