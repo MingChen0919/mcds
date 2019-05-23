@@ -369,7 +369,7 @@ def fill_categorical_features_na_by_group_mode(df, categorical_f, group_by=()):
 	return df
 
 
-class DatasetsVersionController:
+class DatasetsLogger:
 	"""
 	During the data analysis process, I find that sometimes I need to apply different data manipulation processes to the
 	same dataset. I end up with several different versions of preprocessed datasets and many times it is hard to determine
