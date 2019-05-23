@@ -288,6 +288,8 @@ class FeatureBags:
 				self.ordinal_f = feature_bags.loc[feature_bags['type'] == 'ordinal_f', 'feature'].to_list()
 			if type == 'id_f':
 				self.id_f = feature_bags.loc[feature_bags['type'] == 'id_f', 'feature'].to_list()
+			if type == 'datetime_f':
+				self.datetime_f = feature_bags.loc[feature_bags['type'] == 'datetime_f', 'feature'].to_list()
 			if type == 'unused_f':
 				self.unused_f = feature_bags.loc[feature_bags['type'] == 'unused_f', 'feature'].to_list()
 
